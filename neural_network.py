@@ -42,7 +42,7 @@ class NeuralNetwork:
         # TODO: Make necessary changes here. For example, assigning the arguments "input_dim" and "hidden_layer" to
         # variables and so forth.
 
-    def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data_breast_cancer.p')) -> None:
+    def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
         Do not change anything in this method.
 
