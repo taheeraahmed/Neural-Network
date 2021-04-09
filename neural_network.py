@@ -41,7 +41,7 @@ class NeuralNetwork:
 
         # TODO: Make necessary changes here. For example, assigning the arguments "input_dim" and "hidden_layer" to
         # variables and so forth.
-
+        
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
         Do not change anything in this method.
@@ -60,6 +60,9 @@ class NeuralNetwork:
             self.x_train, self.y_train = data['x_train'], data['y_train']
             self.x_test, self.y_test = data['x_test'], data['y_test']
 
+    #def sigmoid(self):
+        #return 1 / (1 + np.exp(-x))
+
     def train(self) -> None:
         """Run the backpropagation algorithm to train this neural network"""
         # TODO: Implement the back-propagation algorithm outlined in Figure 18.24 (page 734) in AIMA 3rd edition.
@@ -67,10 +70,13 @@ class NeuralNetwork:
 
         # Line 6 in Figure 18.24 says "repeat".
         # We are going to repeat self.epochs times as written in the __init()__ method.
+        for i in self.epochs:
+            do backward prop :3
 
         # Line 27 in Figure 18.24 says "return network". Here you do not need to return anything as we are coding
         # the neural network as a class
         pass
+
 
     def predict(self, x: np.ndarray) -> float:
         """
@@ -81,7 +87,9 @@ class NeuralNetwork:
         """
         # TODO: Implement the forward pass.
         return 1  # Placeholder, remove when implementing
-
+    
+    def sigmoid(self,sum):
+        return 1 / (1 + np.exp(-sum))
 
 class TestAssignment5(unittest.TestCase):
     """
