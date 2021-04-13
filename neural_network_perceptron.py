@@ -24,7 +24,8 @@ class Node:
     def __init__(self, weights=None, inputs=None):
         self.weights = []
         self.inputs = []
-        self.value = None
+        self.outputs = None
+        self.bias = bias
         self.activation = None
 
 class NeuralNetwork:
@@ -42,7 +43,12 @@ class NeuralNetwork:
         # Use the parameters below to train your feed-forward neural network.
 
         # Number of hidden units if hidden_layer = True.
-        self.hidden_units = 25
+        if (hidden_layer == True):
+            self.hidden_units = 25
+        
+        else: 
+            self.hidden_units = 0
+            
 
         # This parameter is called the step size, also known as the learning rate (lr).
         # See 18.6.1 in AIMA 3rd edition (page 719).
@@ -64,6 +70,8 @@ class NeuralNetwork:
         # variables and so forth.
         # input dim should be number of attributes in x_train
         self.input_dim = input_dim
+        self.output = 1
+        self.input_weights = np.random.random_sample(size=(input_dim,))
 
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
@@ -87,10 +95,30 @@ class NeuralNetwork:
         """Run the backpropagation algorithm to train this neural network"""
         # TODO: Implement the back-propagation algorithm outlined in Figure 18.24 (page 734) in AIMA 3rd edition.
         # Only parts of the algorithm need to be implemented since we are only going for one hidden layer.
-
         # Line 6 in Figure 18.24 says "repeat".
-        # We are going to repeat self.epochs times as written in the __init()__ method.
-        
+
+        # Initializing everything
+        input = self.input_dim
+        weights = self.input_weights
+        epochs = self.epochs
+        examples = self.x_train
+
+        for i in range(epochs):
+            count = 0
+            for example in examples:
+                # Forward propagation
+                a = example * weights
+                # SPØR: hva gjør man med a?? for å lage output
+                # Sender den gjennom sigmoid sånn den i veffal er mellom 0 og 1 
+                output = sigmoid(sum(a))
+                print(output)
+                # Ettersom dette er perceptron dropper å iterere gjennom lag fordi lol 
+                # Dropper linje 7 - 11 enn så lenge
+
+                # Backward propagation
+                # Er bare en output node
+
+
 
         # Line 27 in Figure 18.24 says "return network". Here you do not need to return anything as we are coding
         # the neural network as a class
