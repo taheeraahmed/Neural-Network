@@ -102,23 +102,35 @@ class NeuralNetwork:
         weights = self.input_weights
         epochs = self.epochs
         examples = self.x_train
+        y_train = self.y_train
 
         for i in range(epochs):
             count = 0
-            for example in examples:
+            for x_j,y_j in zip(examples,y_train):
+                print(x_j,y_j)
                 # Forward propagation
-                a = example * weights
+                a = x_j * weights
+                in_j = sum(a)
                 # SPØR: hva gjør man med a?? for å lage output
                 # Sender den gjennom sigmoid sånn den i veffal er mellom 0 og 1 
-                output = sigmoid(sum(a))
-                print(output)
+                a_j= sigmoid(in_j)
                 # Ettersom dette er perceptron dropper å iterere gjennom lag fordi lol 
                 # Dropper linje 7 - 11 enn så lenge
 
                 # Backward propagation
-                # Er bare en output node
+                # Er bare en output node 
+                g_prime = sigmoid_prime(in_j)
+                temp = y_j-a_j
+                print(temp)
+                delta_j = g_prime * temp
+                print(delta_j)
 
-
+                # Updating the weights
+                i = 0
+                for w_j,a_j in zip(weights,a):
+                    w_j = w_j + self.lr * a_j * delta_j
+                    weights[i] = w_j
+                    i += 1
 
         # Line 27 in Figure 18.24 says "return network". Here you do not need to return anything as we are coding
         # the neural network as a class
