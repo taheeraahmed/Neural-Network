@@ -69,9 +69,10 @@ class NeuralNetwork:
         # TODO: Make necessary changes here. For example, assigning the arguments "input_dim" and "hidden_layer" to
         # variables and so forth.
         # input dim should be number of attributes in x_train
+        # implementere lag klasse: inneholder alle noder i et av lagene
+        # ta fra input, returnere output verdi
         self.input_dim = input_dim
-        self.output = 1
-        self.input_weights = np.random.random_sample(size=(input_dim,))
+        self.weights = np.random.random_sample(size=(input_dim,))
 
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
@@ -99,31 +100,31 @@ class NeuralNetwork:
 
         # Initializing everything
         input = self.input_dim
-        weights = self.input_weights
+        weights = self.weights
         epochs = self.epochs
         examples = self.x_train
         y_train = self.y_train
 
         for i in range(epochs):
-            count = 0
             for x_j,y_j in zip(examples,y_train):
-                print(x_j,y_j)
-                # Forward propagation
+                #print(x_j,y_j)
+                # FORWARD PROPAGATIN
                 a = x_j * weights
                 in_j = sum(a)
                 # SPØR: hva gjør man med a?? for å lage output
-                # Sender den gjennom sigmoid sånn den i veffal er mellom 0 og 1 
+                # Sender den gjennom sigmoid sånn at den i veffal er mellom 0 og 1 
                 a_j= sigmoid(in_j)
                 # Ettersom dette er perceptron dropper å iterere gjennom lag fordi lol 
                 # Dropper linje 7 - 11 enn så lenge
 
-                # Backward propagation
+                # BACKWARD PROPAGATION
                 # Er bare en output node 
                 g_prime = sigmoid_prime(in_j)
                 temp = y_j-a_j
-                print(temp)
+                #print(temp)
+                # SPØR: Kan jeg bare gange ettersom??
                 delta_j = g_prime * temp
-                print(delta_j)
+                #print(delta_j)
 
                 # Updating the weights
                 i = 0
@@ -144,8 +145,10 @@ class NeuralNetwork:
         :param x: A single example (vector) with shape = (number of features)
         :return: A float specifying probability which is bounded [0, 1].
         """
-        # TODO: Implement the forward pass.
-        return 1  # Placeholder, remove when implementing
+        temp = sum(np.einsum('ii->i', np.einsum('i,j->ij', x, self.weights)))
+        # Gange vektor x med vekter 
+        # summere + sigmoid
+        return sigmoid(temp)  # Placeholder, remove when implementing
 
 class TestAssignment5(unittest.TestCase):
     """
