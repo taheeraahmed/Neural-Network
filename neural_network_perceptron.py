@@ -14,6 +14,21 @@ def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 
+
+class Node:
+    """
+    A node in the layer of the neural network
+    inputs: Incoming connections
+    weights: Weights to incoming connections
+    """
+
+    def __init__(self, weights=None, inputs=None):
+        self.weights = []
+        self.inputs = []
+        self.outputs = None
+        self.bias = bias
+        self.activation = None
+
 class NeuralNetwork:
     """Implement/make changes to places in the code that contains #TODO."""
 
@@ -29,7 +44,12 @@ class NeuralNetwork:
         # Use the parameters below to train your feed-forward neural network.
 
         # Number of hidden units if hidden_layer = True.
-        self.hidden_units = 25
+        if (hidden_layer == True):
+            self.hidden_units = 25
+        
+        else: 
+            self.hidden_units = 0
+            
 
         # This parameter is called the step size, also known as the learning rate (lr).
         # See 18.6.1 in AIMA 3rd edition (page 719).
@@ -49,7 +69,12 @@ class NeuralNetwork:
 
         # TODO: Make necessary changes here. For example, assigning the arguments "input_dim" and "hidden_layer" to
         # variables and so forth.
-        
+        # input dim should be number of attributes in x_train
+        # implementere lag klasse: inneholder alle noder i et av lagene
+        # ta fra input, returnere output verdi
+        self.input_dim = input_dim
+        self.weights = np.random.uniform(low=-1, high=1, size=(input_dim+1,))
+
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
         Do not change anything in this method.
@@ -68,23 +93,40 @@ class NeuralNetwork:
             self.x_train, self.y_train = data['x_train'], data['y_train']
             self.x_test, self.y_test = data['x_test'], data['y_test']
 
-    #def sigmoid(self):
-        #return 1 / (1 + np.exp(-x))
-
     def train(self) -> None:
         """Run the backpropagation algorithm to train this neural network"""
-        # TODO: Implement the back-propagation algorithm outlined in Figure 18.24 (page 734) in AIMA 3rd edition.
-        # Only parts of the algorithm need to be implemented since we are only going for one hidden layer.
+        
+        # Initializing everything
+        input = self.input_dim
+        weights = self.weights
+        epochs = self.epochs
+        examples = self.x_train
+        y_train = self.y_train
 
-        # Line 6 in Figure 18.24 says "repeat".
-        # We are going to repeat self.epochs times as written in the __init()__ method.
-        for i in self.epochs:
-            do backward prop :3
+        for i in range(epochs):
+            for x_j,y_j in zip(examples,y_train):
+                #print(x_j,y_j)
+                # FORWARD PROPAGATION
+                arr = np.array([1])
+                x_j = np.concatenate((x_j, arr))
+                a = x_j * weights
+                in_j = sum(a)
+                a_j= sigmoid(in_j)
+                # Ettersom dette er perceptron dropper å iterere gjennom lag fordi lol 
+                # Dropper linje 7 - 11 enn så lenge
 
-        # Line 27 in Figure 18.24 says "return network". Here you do not need to return anything as we are coding
-        # the neural network as a class
-        pass
+                # BACKWARD PROPAGATION
+                g_prime = sigmoid_prime(in_j)
+                temp = y_j-a_j
+                delta_j = g_prime * temp
 
+                # UPDATE WEIGHTS
+                i = 0
+                for w_i,a_i in zip(weights,x_j):
+                    w_i = w_i + (self.lr * a_i * delta_j)
+                    weights[i] = w_i
+                    i += 1
+        self.weights = weights
 
     def predict(self, x: np.ndarray) -> float:
         """
@@ -93,8 +135,9 @@ class NeuralNetwork:
         :param x: A single example (vector) with shape = (number of features)
         :return: A float specifying probability which is bounded [0, 1].
         """
-        # TODO: Implement the forward pass.
-        return 1  # Placeholder, remove when implementing
+        arr = np.array([1])
+        x = np.concatenate((x, arr))
+        return sigmoid(sum(x*self.weights))
 
 class TestAssignment5(unittest.TestCase):
     """
@@ -115,8 +158,7 @@ class TestAssignment5(unittest.TestCase):
     def get_accuracy(self) -> float:
         """Calculate classification accuracy on the test dataset."""
         self.network.load_data()
-        self.network.train()
-
+        self.network.train() 
         n = len(self.network.y_test)
         correct = 0
         for i in range(n):
@@ -137,14 +179,14 @@ class TestAssignment5(unittest.TestCase):
                         'This implementation is most likely wrong since '
                         f'the accuracy ({accuracy}) is less than {self.threshold}.')
 
-    def test_one_hidden(self) -> None:
-        """Run this method to see if Part 2 is implemented correctly."""
+    # def test_one_hidden(self) -> None:
+    #     """Run this method to see if Part 2 is implemented correctly."""
 
-        self.network = self.nn_class(self.n_features, True)
-        accuracy = self.get_accuracy()
-        self.assertTrue(accuracy > self.threshold,
-                        'This implementation is most likely wrong since '
-                        f'the accuracy ({accuracy}) is less than {self.threshold}.')
+    #     self.network = self.nn_class(self.n_features, True)
+    #     accuracy = self.get_accuracy()
+    #     self.assertTrue(accuracy > self.threshold,
+    #                     'This implementation is most likely wrong since '
+    #                     f'the accuracy ({accuracy}) is less than {self.threshold}.')
 
 
 if __name__ == '__main__':
