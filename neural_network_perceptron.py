@@ -73,7 +73,7 @@ class NeuralNetwork:
         # implementere lag klasse: inneholder alle noder i et av lagene
         # ta fra input, returnere output verdi
         self.input_dim = input_dim
-        self.weights = np.random.uniform(low=-0.5, high=0.5, size=(input_dim,))
+        self.weights = np.random.uniform(low=-1, high=1, size=(input_dim+1,))
 
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
@@ -107,6 +107,8 @@ class NeuralNetwork:
             for x_j,y_j in zip(examples,y_train):
                 #print(x_j,y_j)
                 # FORWARD PROPAGATION
+                arr = np.array([1])
+                x_j = np.concatenate((x_j, arr))
                 a = x_j * weights
                 in_j = sum(a)
                 a_j= sigmoid(in_j)
@@ -120,7 +122,7 @@ class NeuralNetwork:
 
                 # UPDATE WEIGHTS
                 i = 0
-                for w_i,a_i in zip(weights,a):
+                for w_i,a_i in zip(weights,x_j):
                     w_i = w_i + (self.lr * a_i * delta_j)
                     weights[i] = w_i
                     i += 1
@@ -133,6 +135,8 @@ class NeuralNetwork:
         :param x: A single example (vector) with shape = (number of features)
         :return: A float specifying probability which is bounded [0, 1].
         """
+        arr = np.array([1])
+        x = np.concatenate((x, arr))
         return sigmoid(sum(x*self.weights))
 
 class TestAssignment5(unittest.TestCase):
