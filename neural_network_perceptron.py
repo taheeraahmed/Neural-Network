@@ -179,14 +179,14 @@ class TestAssignment5(unittest.TestCase):
                         'This implementation is most likely wrong since '
                         f'the accuracy ({accuracy}) is less than {self.threshold}.')
 
-    # def test_one_hidden(self) -> None:
-    #     """Run this method to see if Part 2 is implemented correctly."""
+    def test_one_hidden(self) -> None:
+        """Run this method to see if Part 2 is implemented correctly."""
 
-    #     self.network = self.nn_class(self.n_features, True)
-    #     accuracy = self.get_accuracy()
-    #     self.assertTrue(accuracy > self.threshold,
-    #                     'This implementation is most likely wrong since '
-    #                     f'the accuracy ({accuracy}) is less than {self.threshold}.')
+        self.network = self.nn_class(self.n_features, True)
+        accuracy = self.get_accuracy()
+        self.assertTrue(accuracy > self.threshold,
+                        'This implementation is most likely wrong since '
+                        f'the accuracy ({accuracy}) is less than {self.threshold}.')
 
 
 if __name__ == '__main__':
