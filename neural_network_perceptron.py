@@ -16,11 +16,12 @@ def sigmoid_prime(z):
 
 
 class Layer:
-    def __init__(self, num_units: int):
+    def __init__(self, num_units: int, input_dim: int):
         #self.num_units = num_units
         # Skal lagre input til alle noder i en liste? Burde være input_dim lang
-        self.input = []
-        
+        self.activations = []
+        self.output_weights = np.random.uniform(low=-1, high=1, size=(num_units,))
+        self.input_weights = np.random.uniform(low=-1, high=1, size=(num_units,(input_dim+1)))
 class NeuralNetwork:
     """Implement/make changes to places in the code that contains #TODO."""
 
@@ -64,7 +65,6 @@ class NeuralNetwork:
         if (hidden_layer == True):
             self.hidden_units = 25
             self.num_layers = 1
-            self.weights_input = np.random.uniform(low=-1, high=1, size=(self.hidden_units,(self.input_dim+1)))
         else: 
             self.hidden_units = 0
             self.num_layers = 0
@@ -99,7 +99,7 @@ class NeuralNetwork:
         # TODO: Smart måte å vite om det skal være lag eller ikke 
         # SPØR: Hva burde jeg lagre i layer? 
         
-        layer = Layer(self.hidden_units)
+        layer = Layer(self.hidden_units, input_dim)
 
         # Perceptron
         for i in range(self.epochs):
@@ -116,11 +116,11 @@ class NeuralNetwork:
                     # Calculating the in_j and a_j
                     for node in range(self.hidden_units): 
                         input_val = (sum(self.weights_input[node] * activation_input[node]))
-                        activation_node.append(sigmoid)
-                    
-                    g_prime = sigmoid_prime(np.asarray(input_val))
-                    activation_layer = layer.input
-                    delta_j = g_prime * (y_j - activation_layer)
+                        activation_node.append(sigmoid(input_val))
+                    # SPØR I LINJE 10 SKAL MAN BARE HA EN VERDI?
+                    layer.activations = np.asarray(activation_node)
+                    g_prime = sigmoid_prime(layer.activations)
+                    delta_j = g_prime * (y_j - layer.activations)
                         
                         
                 # Not hidden layer
