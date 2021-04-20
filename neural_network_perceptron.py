@@ -64,8 +64,7 @@ class NeuralNetwork:
         if (hidden_layer == True):
             self.hidden_units = 25
             self.num_layers = 1
-            self.weights_input = np.random.uniform(low=-1, high=1, size=((input_dim*self.hidden_units)+1,))
-        
+            self.weights_input = np.random.uniform(low=-1, high=1, size=(self.hidden_units,(self.input_dim+1)))
         else: 
             self.hidden_units = 0
             self.num_layers = 0
@@ -113,17 +112,16 @@ class NeuralNetwork:
 
                 # Hidden layer
                 if self.hidden_layer == True:
-                    input_val = []
-                    # Calculating the in_j <- w_i,j * a_i
-                    for node in range(input_dim + 1): 
-                        input_val.append(self.weights_input * activation_input[node])
-                    # Calculating the activation for each node and putting them in layer list of 
-                    # input activation values
-                    for val in input_val:
-                        activation_node = sigmoid(sum(val))
-                        layer.input.append(activation_node)
+                    activation_node = []
+                    # Calculating the in_j and a_j
+                    for node in range(self.hidden_units): 
+                        input_val = (sum(self.weights_input[node] * activation_input[node]))
+                        activation_node.append(sigmoid)
                     
                     g_prime = sigmoid_prime(np.asarray(input_val))
+                    activation_layer = layer.input
+                    delta_j = g_prime * (y_j - activation_layer)
+                        
                         
                 # Not hidden layer
                 else:
