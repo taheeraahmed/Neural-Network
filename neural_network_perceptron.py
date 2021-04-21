@@ -20,8 +20,10 @@ class Layer:
         #self.num_units = num_units
         # Skal lagre input til alle noder i en liste? Burde være input_dim lang
         self.activations = []
+        self.output = float
         self.output_weights = np.random.uniform(low=-1, high=1, size=(num_units,))
         self.input_weights = np.random.uniform(low=-1, high=1, size=(num_units,(input_dim+1)))
+
 class NeuralNetwork:
     """Implement/make changes to places in the code that contains #TODO."""
 
@@ -38,11 +40,11 @@ class NeuralNetwork:
         # This parameter is called the step size, also known as the learning rate (lr).
         # See 18.6.1 in AIMA 3rd edition (page 719).
         # This is the value of α on Line 25 in Figure 18.24.
-        self.lr = 1e-3
+        self.lr = 1e-1
 
         # Line 6 in Figure 18.24 says "repeat".
         # This is the number of times we are going to repeat. This is often known as epochs.
-        self.epochs = 400
+        self.epochs = 800
 
         # We are going to store the data here.
         # Since you are only asked to implement training for the feed-forward neural network,
@@ -59,6 +61,8 @@ class NeuralNetwork:
         self.input_dim = input_dim
         # + 1 pga bias
         self.weights = np.random.uniform(low=-1, high=1, size=(input_dim+1,))
+
+        
 
         # Number of hidden units if hidden_layer = True.
         self.hidden_layer = hidden_layer
@@ -91,7 +95,6 @@ class NeuralNetwork:
         """Run the backpropagation algorithm to train this neural network"""
         
         # Initializing everything
-        input_dim = self.input_dim
         weights = self.weights
         examples = self.x_train
         y_train = self.y_train
@@ -99,7 +102,7 @@ class NeuralNetwork:
         # TODO: Smart måte å vite om det skal være lag eller ikke 
         # SPØR: Hva burde jeg lagre i layer? 
         
-        layer = Layer(self.hidden_units, input_dim)
+        layer = Layer(self.hidden_units, self.input_dim)
 
         # Perceptron
         for i in range(self.epochs):
@@ -108,21 +111,42 @@ class NeuralNetwork:
                 # Input layer
                 bias = np.array([1])                 # Fikser bias
                 x_j = np.concatenate((x_j, bias))    # a_i <- x_i
-                activation_input = x_j * weights    # a_i <- x_i
+                activation_input = x_j * weights     # a_i <- x_i
 
                 # Hidden layer
                 if self.hidden_layer == True:
                     activation_node = []
+                    # FORWARD PROPAGATION
                     # Calculating the in_j and a_j
                     for node in range(self.hidden_units): 
-                        input_val = (sum(self.weights_input[node] * activation_input[node]))
+                        input_val = (sum(layer.input_weights[node] * activation_input[node]))
                         activation_node.append(sigmoid(input_val))
-                    # SPØR I LINJE 10 SKAL MAN BARE HA EN VERDI?
                     layer.activations = np.asarray(activation_node)
-                    g_prime = sigmoid_prime(layer.activations)
-                    delta_j = g_prime * (y_j - layer.activations)
-                        
-                        
+                    
+                    # TODO: Dersom dette funker, fiks!! 
+                    layer.output = sigmoid(sum(layer.activations * layer.output_weights))
+                    
+                    # BACKWARD PROPAGATION
+                    g_prime = sigmoid_prime(layer.output)
+                    delta_j = g_prime * (y_j - layer.output)
+
+                    # UPDATE WEIGHTS  
+                    # Har lagret vektene hver for seg i layer, input weights er vektene fra input til
+                    # hidden layer, mens output vektene er fra hidden layer til output  
+                    temp = []
+                    for out_weight, act_node in zip(layer.output_weights, layer.activations):
+                        out_weight = out_weight + (self.lr * act_node * delta_j)
+                        temp.append(out_weight)
+                    layer.output_weights = np.asarray(temp)
+
+                    i = 0
+                    for in_weights, act_in in zip(layer.input_weights, activation_input):
+                        temp = []
+                        for weight in in_weights:
+                            weight = weight + (self.lr * act_in * delta_j)
+                            temp.append(weight)
+                        layer.input_weights[i] = np.asarray(temp)
+                        i += 1
                 # Not hidden layer
                 else:
                     in_j = sum(activation_input)
@@ -185,14 +209,14 @@ class TestAssignment5(unittest.TestCase):
             correct += self.network.y_test[i] == round(float(pred))
         return round(correct / n, 3)
 
-    # def test_perceptron(self) -> None:
-    #     """Run this method to see if Part 1 is implemented correctly."""
+    def test_perceptron(self) -> None:
+        """Run this method to see if Part 1 is implemented correctly."""
 
-    #     self.network = self.nn_class(self.n_features, False)
-    #     accuracy = self.get_accuracy()
-    #     self.assertTrue(accuracy > self.threshold,
-    #                     'This implementation is most likely wrong since '
-    #                     f'the accuracy ({accuracy}) is less than {self.threshold}.')
+        self.network = self.nn_class(self.n_features, False)
+        accuracy = self.get_accuracy()
+        self.assertTrue(accuracy > self.threshold,
+                        'This implementation is most likely wrong since '
+                        f'the accuracy ({accuracy}) is less than {self.threshold}.')
 
     def test_one_hidden(self) -> None:
         """Run this method to see if Part 2 is implemented correctly."""
