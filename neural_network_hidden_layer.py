@@ -149,7 +149,7 @@ class NeuralNetwork:
         bias = np.array([1])                 # Fikser bias
         activation_input = np.concatenate((x, bias))    # a_i <- x_i
         
-        activations = np.zeros(shape=(num_units,))
+        activations = np.zeros(shape=(self.num_units,))
 
         for hidden_node in range(self.num_units):
             # Calculating w_ij * a_i
