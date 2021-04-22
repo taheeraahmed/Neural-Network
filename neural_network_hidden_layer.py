@@ -148,6 +148,9 @@ class NeuralNetwork:
         # Setting up the bias
         bias = np.array([1])                 # Fikser bias
         activation_input = np.concatenate((x, bias))    # a_i <- x_i
+        
+        activations = np.zeros(shape=(num_units,))
+
         for hidden_node in range(self.num_units):
             # Calculating w_ij * a_i
             input = np.multiply(self.input_weights[hidden_node], activation_input)
@@ -156,13 +159,11 @@ class NeuralNetwork:
             # Calculating the activation for one node in the hidden layer
             activation_node = sigmoid(sum_input)
             # Saving stuff in layer
-            layer.activations[hidden_node] = activation_node
+            activations[hidden_node] = activation_node
 
         # Output value
-        layer.activation_output = sigmoid(sum(np.multiply(layer.activations, self.output_weights)))
-
-        
-        return output_activation
+        activation_output = sigmoid(sum(np.multiply(activations, self.output_weights)))
+        return  activation_output
     
 
 class TestAssignment5(unittest.TestCase):
