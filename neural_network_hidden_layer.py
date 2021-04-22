@@ -16,12 +16,11 @@ def sigmoid_prime(z):
 
 
 class Layer:
-    def __init__(self, num_units: int, input_dim: int):
+    def __init__(self, units: int, weights: array):
         #self.num_units = num_units
         # Skal lagre input til alle noder i en liste? Burde være input_dim lang
-        self.activations = np.zeros(shape=(num_units,))
-        self.activation_output = float
-        self.sum_input_activation = np.zeros(shape=(num_units,))
+        self.activations_input = np.zeros(shape=(units,))
+        self.activations_output = float
         self.delta_i = []
 
 class NeuralNetwork:
@@ -53,18 +52,16 @@ class NeuralNetwork:
         self.x_train, self.y_train = None, None
         self.x_test, self.y_test = None, None
 
-        # TODO: Make necessary changes here. For example, assigning the arguments "input_dim" and "hidden_layer" to
-        # variables and so forth.
-        # input dim should be number of attributes in x_train
-        # implementere lag klasse: inneholder alle noder i et av lagene
-        # ta fra input, returnere output verdi
         self.input_dim = input_dim
-        # + 1 pga bias
         self.num_units = 25
-        # Number of hidden units if hidden_layer = True.
-        # We want 31 weights per 25 hidden units
+
         self.input_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,self.input_dim+1))
+        self.input_layer = Layer(self.input_dim, self.input_weights)
+
         self.output_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,))
+        self.hidden_layer = Layer(self.num_units, self.output_weights)
+
+        self.layers = [self.input_layer, self.hidden_layer]
 
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
