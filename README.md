@@ -6,5 +6,5 @@ We are going to classify wheter a cell is malignant or not using the ´data/brea
 Passes the test ✔️
 
 ### Neural network
-WIP: Supposed to have one hidden layer with 25 hidden units. 
-
+The neural network only consists of one hidden layer with 25 nodes. 
+Passes the test (sometimes) ✔️
