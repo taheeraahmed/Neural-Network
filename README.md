@@ -7,4 +7,5 @@ Passes the test ✔️
 
 ### Neural network
 The neural network only consists of one hidden layer with 25 nodes. 
+
 Passes the test (sometimes) ✔️
