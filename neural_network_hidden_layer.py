@@ -63,8 +63,8 @@ class NeuralNetwork:
         self.num_units = 25
         # Number of hidden units if hidden_layer = True.
         # We want 31 weights per 25 hidden units
-        self.input_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,self.input_dim+1))
-        self.output_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,))
+        self.hidden_input_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,self.input_dim+1))
+        self.hidden_output_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,))
 
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
@@ -102,7 +102,7 @@ class NeuralNetwork:
                 activation_input = np.concatenate((x_j, bias))    # a_i <- x_i
                 for hidden_node in range(self.num_units):
                     # Calculating w_ij * a_i
-                    input = np.multiply(self.input_weights[hidden_node], activation_input)
+                    input = np.multiply(self.hidden_input_weights[hidden_node], activation_input)
                     # Calculating the sum of w_ij * a_i
                     sum_input = sum(input)
                     # Calculating the activation for one node in the hidden layer
@@ -111,7 +111,7 @@ class NeuralNetwork:
                     layer.activations[hidden_node] = activation_node
 
                 # Output value
-                layer.activation_output = sigmoid(sum(np.multiply(layer.activations, self.output_weights)))
+                layer.activation_output = sigmoid(sum(np.multiply(layer.activations, self.hidden_output_weights)))
                 
                 # BACKWARD PROPAGATION
                 # Bare en output node, driter i for-løkken på linje 12
