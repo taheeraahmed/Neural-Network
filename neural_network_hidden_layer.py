@@ -15,14 +15,21 @@ def sigmoid_prime(z):
     return sigmoid(z)*(1-sigmoid(z))
 
 
-class Layer:
+class HiddenLayer:
     def __init__(self, num_units: int, input_dim: int):
-        #self.num_units = num_units
-        # Skal lagre input til alle noder i en liste? Burde være input_dim lang
+        # Inital weights, will be updated as we go
+        # The incoming weights from input layer
+        self.input_weights = np.random.uniform(low=-1, high=1, size=(num_units,input_dim+1))
+        # The outgoing weights to output layer
+        self.output_weights = np.random.uniform(low=-1, high=1, size=(num_units,))
+        # Before using the activation
+        self.input = np.zeros(shape=(num_units,))
+        # After putting the input in the activation function
         self.activations = np.zeros(shape=(num_units,))
-        self.activation_output = float
-        self.sum_input_activation = np.zeros(shape=(num_units,))
-        self.delta_i = []
+        # The deltas from output layer used to update the weights for the incoming weights
+        # from the input layer 
+        self.delta_i = np.zeros(shape=(num_units,))
+        
 
 class NeuralNetwork:
     """Implement/make changes to places in the code that contains #TODO."""
@@ -63,9 +70,9 @@ class NeuralNetwork:
         self.num_units = 25
         # Number of hidden units if hidden_layer = True.
         # We want 31 weights per 25 hidden units
-        self.hidden_input_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,self.input_dim+1))
-        self.hidden_output_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,))
+        self.hiddenlayer = HiddenLayer(self.num_units, self.input_dim)
 
+        
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
         Do not change anything in this method.
@@ -92,48 +99,45 @@ class NeuralNetwork:
         y_train = self.y_train
         
         
-        layer = Layer(self.num_units, self.input_dim)
+        
 
         for i in range(self.epochs):
             for x_j,y_j in zip(examples,y_train):
                 # FORWARD PROPAGATION
-                # Input weights
-                bias = np.array([1])                 # Fikser bias
-                activation_input = np.concatenate((x_j, bias))    # a_i <- x_i
+                # Activation the input weights
+                bias = np.array([1])
+                activation_input = np.concatenate((x_j, bias))  
+
+                # Activating the hidden nodes
                 for hidden_node in range(self.num_units):
                     # Calculating w_ij * a_i
-                    input = np.multiply(self.hidden_input_weights[hidden_node], activation_input)
+                    input = np.multiply(self.hiddenlayer.input_weights[hidden_node], activation_input)
                     # Calculating the sum of w_ij * a_i
                     sum_input = sum(input)
                     # Calculating the activation for one node in the hidden layer
                     activation_node = sigmoid(sum_input)
                     # Saving stuff in layer
-                    layer.activations[hidden_node] = activation_node
+                    self.hiddenlayer.input[hidden_node] = sum_input
+                    self.hiddenlayer.activations[hidden_node] = activation_node
 
-                # Output value
-                layer.activation_output = sigmoid(sum(np.multiply(layer.activations, self.hidden_output_weights)))
+                # Output activation
+                activation_output = sigmoid(sum(np.multiply(self.hiddenlayer.activations, self.hiddenlayer.output_weights)))
                 
                 # BACKWARD PROPAGATION
-                # Bare en output node, driter i for-løkken på linje 12
-                sigmoid_prime_output = sigmoid_prime(layer.activation_output)
-                # SPØR: Hva er a_j her, linje 13? det blir det riktig å bruke activation_output?
-                delta_j = sigmoid_prime_output * (y_j-layer.activation_output)
-
-                # SPØR: Hva gjør delta i på linje 16??? Hvordan påvirker den vektene i nettverket? 
-                # for alle noder i ikke output laget -> gjør delta i greiene på linje 16
-                # for i in range(self.input_dim+self.num_units):
-
+                sigmoid_prime_output = sigmoid_prime(activation_output)
+                delta_j = sigmoid_prime_output * (y_j-activation_output)
+                
+                # Passing deltas backwards 
+                sp_i = sigmoid_prime(self.hiddenlayer.input)
+                self.hiddenlayer.delta_i = sp_i*(self.hiddenlayer.input_weights.sum(axis=1)*delta_j)
                 # UPDATE WEIGHTS
-                # weight_input = numpy.array(25,31)
-                # alle 25 noder har 31 input vekter
-                # all_weights = np.concatenate((self.input_weights, self.output_weights),axis=0)
-                # Calculating the updating factor for each layer
-                update_input = self.lr * activation_input * delta_j
-                update_output = self.lr * layer.activations * delta_j
-                # Updating the weights in the network
-                for k in range(len(self.input_weights)):
-                    self.input_weights[k] = np.add(self.input_weights[k], update_input)
-                self.output_weights = np.add(self.output_weights, update_output)
+                # Updating the hidden layer output weights
+                update_output = self.lr * self.hiddenlayer.activations * delta_j
+                self.hiddenlayer.output_weights = np.add(self.hiddenlayer.output_weights, update_output)
+                # Updating the hidden layer input weights
+                input_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,self.input_dim+1))
+                temp = np.einsum('i,ij->ij', self.lr * self.hiddenlayer.delta_i, self.hiddenlayer.input_weights)
+                self.hiddenlayer.input_weights = temp + self.hiddenlayer.input_weights
 
 
 
@@ -145,24 +149,25 @@ class NeuralNetwork:
         :param x: A single example (vector) with shape = (number of features)
         :return: A float specifying probability which is bounded [0, 1].
         """
-        # Setting up the bias
-        bias = np.array([1])                 # Fikser bias
-        activation_input = np.concatenate((x, bias))    # a_i <- x_i
-        
-        activations = np.zeros(shape=(self.num_units,))
+         # FORWARD PROPAGATION
+        # Activation the input weights
+        bias = np.array([1])
+        activation_input = np.concatenate((x, bias))  
 
+        # Activating the hidden nodes
         for hidden_node in range(self.num_units):
             # Calculating w_ij * a_i
-            input = np.multiply(self.input_weights[hidden_node], activation_input)
+            input = np.multiply(self.hiddenlayer.input_weights[hidden_node], activation_input)
             # Calculating the sum of w_ij * a_i
             sum_input = sum(input)
             # Calculating the activation for one node in the hidden layer
             activation_node = sigmoid(sum_input)
             # Saving stuff in layer
-            activations[hidden_node] = activation_node
+            self.hiddenlayer.input[hidden_node] = sum_input
+            self.hiddenlayer.activations[hidden_node] = activation_node
 
-        # Output value
-        activation_output = sigmoid(sum(np.multiply(activations, self.output_weights)))
+        # Output activation
+        activation_output = sigmoid(sum(np.multiply(self.hiddenlayer.activations, self.hiddenlayer.output_weights)))
         return  activation_output
     
 
