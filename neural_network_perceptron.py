@@ -106,70 +106,28 @@ class NeuralNetwork:
             for x_j,y_j in zip(examples,y_train):
                 # FORWARD PROPAGATION
                 # Input layer
+                weights = self.weights
                 bias = np.array([1])                 # Fikser bias
                 x_j = np.concatenate((x_j, bias))    # a_i <- x_i
-                activation_input = x_j * self.layer.input_weights   # a_i <- x_i
+                activation_input = x_j * weights     # a_i <- x_i
 
-                # Hidden layer
-                if self.hidden_layer == True:
-                    activation_node = []
-                    # FORWARD PROPAGATION
-                    # Calculating the in_j and a_j
-                    for node in range(self.hidden_units): 
-                        input_val = (sum(self.layer.input_weights[node] * activation_input[node]))
-                        activation_node.append(sigmoid(input_val))
-                    self.layer.activations = np.asarray(activation_node)
-                    
-                    # TODO: Dersom dette ikke funker, fiks!! 
-                    self.layer.output = sigmoid(sum(self.layer.activations * self.layer.output_weights))
-                    
-                    # BACKWARD PROPAGATION
-                    g_prime = sigmoid_prime(self.layer.output)
-                    delta_j = g_prime * (y_j - self.layer.output)
+                in_j = sum(activation_input)
+                a_j= sigmoid(in_j)
+                # Ettersom dette er perceptron dropper å iterere gjennom lag fordi lol 
+                # Dropper linje 7 - 11 enn så lenge
 
-                    # UPDATE WEIGHTS  
-                    # Har lagret vektene hver for seg i layer, input weights er vektene fra input til
-                    # hidden layer, mens output vektene er fra hidden layer til output  
-                    temp = []
-                    for out_weight, act_node in zip(self.layer.output_weights, self.layer.activations):
-                        out_weight = out_weight + (self.lr * act_node * delta_j)
-                        temp.append(out_weight)
-                    self.layer.output_weights = np.asarray(temp)
+                # BACKWARD PROPAGATION
+                g_prime = sigmoid_prime(in_j)
+                temp = y_j-a_j
+                delta_j = g_prime * temp
 
-                    i = 0
-                    for in_weights, act_in in zip(self.layer.input_weights, activation_input):
-                        temp = []
-                        for weight in in_weights:
-                            z = sum(self.lr * act_in * delta_j)
-                            temp.append(weight+z)
-                        self.layer.input_weights[i] = np.asarray(temp)
-                        i += 1
-                # Not hidden layer
-                else:
-                    # FORWARD PROPAGATION
-                    # Input layer
-                    weights = self.weights
-                    bias = np.array([1])                 # Fikser bias
-                    x_j = np.concatenate((x_j, bias))    # a_i <- x_i
-                    activation_input = x_j * weights     # a_i <- x_i
-
-                    in_j = sum(activation_input)
-                    a_j= sigmoid(in_j)
-                    # Ettersom dette er perceptron dropper å iterere gjennom lag fordi lol 
-                    # Dropper linje 7 - 11 enn så lenge
-
-                    # BACKWARD PROPAGATION
-                    g_prime = sigmoid_prime(in_j)
-                    temp = y_j-a_j
-                    delta_j = g_prime * temp
-
-                    # UPDATE WEIGHTS
-                    i = 0
-                    for w_i,a_i in zip(weights,x_j):
-                        w_i = w_i + (self.lr * a_i * delta_j)
-                        weights[i] = w_i
-                        i += 1
-                    self.weights = weights
+                # UPDATE WEIGHTS
+                i = 0
+                for w_i,a_i in zip(weights,x_j):
+                    w_i = w_i + (self.lr * a_i * delta_j)
+                    weights[i] = w_i
+                    i += 1
+                self.weights = weights
 
     def predict(self, x: np.ndarray) -> float:
         """
@@ -178,12 +136,9 @@ class NeuralNetwork:
         :param x: A single example (vector) with shape = (number of features)
         :return: A float specifying probability which is bounded [0, 1].
         """
-        if self.hidden_layer == True:
-            return sigmoid(sum(x*self.layer.input_weights))
-        else:
-            arr = np.array([1])
-            x = np.concatenate((x, arr))
-            return sigmoid(sum(x*self.weights))
+        arr = np.array([1])
+        x = np.concatenate((x, arr))
+        return sigmoid(sum(x*self.weights))
 
 class TestAssignment5(unittest.TestCase):
     """
@@ -216,23 +171,23 @@ class TestAssignment5(unittest.TestCase):
             correct += self.network.y_test[i] == round(float(pred))
         return round(correct / n, 3)
 
-    # def test_perceptron(self) -> None:
-    #     """Run this method to see if Part 1 is implemented correctly."""
+    def test_perceptron(self) -> None:
+        """Run this method to see if Part 1 is implemented correctly."""
 
-    #     self.network = self.nn_class(self.n_features, False)
-    #     accuracy = self.get_accuracy()
-    #     self.assertTrue(accuracy > self.threshold,
-    #                     'This implementation is most likely wrong since '
-    #                     f'the accuracy ({accuracy}) is less than {self.threshold}.')
-
-    def test_one_hidden(self) -> None:
-        """Run this method to see if Part 2 is implemented correctly."""
-
-        self.network = self.nn_class(self.n_features, True)
+        self.network = self.nn_class(self.n_features, False)
         accuracy = self.get_accuracy()
         self.assertTrue(accuracy > self.threshold,
                         'This implementation is most likely wrong since '
                         f'the accuracy ({accuracy}) is less than {self.threshold}.')
+
+    # def test_one_hidden(self) -> None:
+    #     """Run this method to see if Part 2 is implemented correctly."""
+
+    #     self.network = self.nn_class(self.n_features, True)
+    #     accuracy = self.get_accuracy()
+    #     self.assertTrue(accuracy > self.threshold,
+    #                     'This implementation is most likely wrong since '
+    #                     f'the accuracy ({accuracy}) is less than {self.threshold}.')
 
 
 if __name__ == '__main__':
