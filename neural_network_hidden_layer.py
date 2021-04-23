@@ -43,35 +43,13 @@ class NeuralNetwork:
         :param hidden_layer: Whether or not to include a hidden layer.
         :return: None.
         """
-
-        # --- PLEASE READ --
-        # Use the parameters below to train your feed-forward neural network.
-        # This parameter is called the step size, also known as the learning rate (lr).
-        # See 18.6.1 in AIMA 3rd edition (page 719).
-        # This is the value of α on Line 25 in Figure 18.24.
         self.lr = 1e-3
-
-        # Line 6 in Figure 18.24 says "repeat".
-        # This is the number of times we are going to repeat. This is often known as epochs.
         self.epochs = 380
-
-        # We are going to store the data here.
-        # Since you are only asked to implement training for the feed-forward neural network,
-        # only self.x_train and self.y_train need to be used. You will need to use them to implement train().
-        # The self.x_test and self.y_test is used by the unit tests. Do not change anything in it.
         self.x_train, self.y_train = None, None
         self.x_test, self.y_test = None, None
 
-        # TODO: Make necessary changes here. For example, assigning the arguments "input_dim" and "hidden_layer" to
-        # variables and so forth.
-        # input dim should be number of attributes in x_train
-        # implementere lag klasse: inneholder alle noder i et av lagene
-        # ta fra input, returnere output verdi
         self.input_dim = input_dim
-        # + 1 pga bias
         self.num_units = 25
-        # Number of hidden units if hidden_layer = True.
-        # We want 31 weights per 25 hidden units
         self.hiddenlayer = HiddenLayer(self.num_units, self.input_dim)
 
         
@@ -99,9 +77,6 @@ class NeuralNetwork:
         # Initializing everything
         examples = self.x_train
         y_train = self.y_train
-        
-        
-        
 
         for i in range(self.epochs):
             for x_j,y_j in zip(examples,y_train):
@@ -132,6 +107,7 @@ class NeuralNetwork:
                 # Passing deltas backwards 
                 sp_i = sigmoid_prime(self.hiddenlayer.input)
                 self.hiddenlayer.delta_i = sp_i*(self.hiddenlayer.input_weights.sum(axis=1)*delta_j)
+                
                 # UPDATE WEIGHTS
                 # Updating the hidden layer output weights
                 update_output = self.lr * self.hiddenlayer.activations * delta_j
@@ -139,10 +115,7 @@ class NeuralNetwork:
                 # Updating the hidden layer input weights
                 temp = np.einsum('i,ij->ij', self.lr * self.hiddenlayer.delta_i, self.hiddenlayer.input_weights)
                 self.hiddenlayer.input_weights = temp + self.hiddenlayer.input_weights
-
-
-
-                
+               
     def predict(self, x: np.ndarray) -> float:
         """
         Given an example x we want to predict its class probability.

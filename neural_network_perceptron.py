@@ -35,44 +35,17 @@ class NeuralNetwork:
         :return: None.
         """
 
-        # --- PLEASE READ --
-        # Use the parameters below to train your feed-forward neural network.
-        # This parameter is called the step size, also known as the learning rate (lr).
-        # See 18.6.1 in AIMA 3rd edition (page 719).
-        # This is the value of α on Line 25 in Figure 18.24.
         self.lr = 1e-3
-
-        # Line 6 in Figure 18.24 says "repeat".
-        # This is the number of times we are going to repeat. This is often known as epochs.
         self.epochs = 380
 
-        # We are going to store the data here.
-        # Since you are only asked to implement training for the feed-forward neural network,
-        # only self.x_train and self.y_train need to be used. You will need to use them to implement train().
-        # The self.x_test and self.y_test is used by the unit tests. Do not change anything in it.
         self.x_train, self.y_train = None, None
         self.x_test, self.y_test = None, None
 
-        # TODO: Make necessary changes here. For example, assigning the arguments "input_dim" and "hidden_layer" to
-        # variables and so forth.
-        # input dim should be number of attributes in x_train
-        # implementere lag klasse: inneholder alle noder i et av lagene
-        # ta fra input, returnere output verdi
         self.input_dim = input_dim
-        # + 1 pga bias
 
-
-        # Number of hidden units if hidden_layer = True.
-        self.hidden_layer = hidden_layer
-        if (hidden_layer == True):
-            self.hidden_units = 25
-            self.num_layers = 1
-            self.layer = Layer(self.hidden_units, self.input_dim)
-
-        else: 
-            self.weights = np.random.uniform(low=-1, high=1, size=(input_dim+1,))
-            self.hidden_units = 0
-            self.num_layers = 0
+        self.weights = np.random.uniform(low=-1, high=1, size=(input_dim+1,))
+        self.hidden_units = 0
+        self.num_layers = 0
 
     def load_data(self, file_path: str = os.path.join(os.getcwd(), 'data/data_breast_cancer.p')) -> None:
         """
@@ -98,9 +71,6 @@ class NeuralNetwork:
         # Initializing everything
         examples = self.x_train
         y_train = self.y_train
-        
-        # TODO: Smart måte å vite om det skal være lag eller ikke 
-        # SPØR: Hva burde jeg lagre i layer? 
         
         for i in range(self.epochs):
             for x_j,y_j in zip(examples,y_train):
