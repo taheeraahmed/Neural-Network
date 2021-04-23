@@ -3,12 +3,12 @@ This is course work for TDT4171 where we are supposed to implement both a percep
 We are going to classify wheter a cell is malignant or not using the ´data/breastcancer.p´ dataset
 
 ### Perceptron 
-The perceptron is implemented in ´neural_network_perceptron.py. It consists only of the input layer and its weights to the output node. 
+The perceptron is implemented in <code>neural_network_perceptron.py</code>. It consists only of the input layer and its weights to the output node. 
 Still it gets a high accuracy of at least 0.8. 
 Passes the test ✔️
 
 ### Neural network
-The neural network only consists of one hidden layer with 25 nodes. 
-The network is ´neural_network_hidden_layer.py´
+This neural network consists of one input layer, one hidden layer with 25 nodes and an output layer. 
+The network is <code>neural_network_hidden_layer.py</code> and gets an accuracy of at least 0.8 as well. 
 
-Passes the test (sometimes) ✔️
+Passes the test ✔️
