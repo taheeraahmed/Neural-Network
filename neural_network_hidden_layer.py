@@ -6,6 +6,8 @@ import pickle
 import os
 import random
 
+np.random.seed(0)
+
 def sigmoid(z):
     """The sigmoid function."""
     return 1.0/(1.0+np.exp(-z))
@@ -135,7 +137,6 @@ class NeuralNetwork:
                 update_output = self.lr * self.hiddenlayer.activations * delta_j
                 self.hiddenlayer.output_weights = np.add(self.hiddenlayer.output_weights, update_output)
                 # Updating the hidden layer input weights
-                input_weights = np.random.uniform(low=-1, high=1, size=(self.num_units,self.input_dim+1))
                 temp = np.einsum('i,ij->ij', self.lr * self.hiddenlayer.delta_i, self.hiddenlayer.input_weights)
                 self.hiddenlayer.input_weights = temp + self.hiddenlayer.input_weights
 
